@@ -1,7 +1,10 @@
 import pyttsx3 as p  # Import the pyttsx3 library and alias it as p
 import speech_recognition as sr  # Import the speech_recognition library and alias it as sr
+import randfacts
 from selenium_web import YahooSearch
 from music import YoutubeSearch
+from joke import *
+from news import *
 
 engine = p.init()  # Initialize the pyttsx3 engine
 rate = engine.getProperty('rate')  # Get the current speaking rate
@@ -47,16 +50,42 @@ if "information" in text2:
         r.adjust_for_ambient_noise(source)
         audio=r.listen(source,10)
         text3=r.recognize_google(audio)
-    speak("Searching for information on yahoo on {}".format(text3))
+    speak("Searching for information on Yahoo about {}".format(text3))
     YahooSearch(text3)
 
-elif "music" or "song" or "play" or "video" in text3:
+elif any(word in text2 for word in ["music", "song", "play", "video"]):  # ✅ Corrected condition
     speak("What song would you like to listen to?")
     with sr.Microphone() as source:
         print("Listening...")
         r.energy_threshold=10000
         r.adjust_for_ambient_noise(source)
         audio=r.listen(source,10)
-        text4=r.recognize_google(audio)
-    speak("Playing {} on youtube".format(text4))
-    YoutubeSearch(text4)
+        text3=r.recognize_google(audio)
+    speak("Playing {} on YouTube".format(text3))
+    YoutubeSearch(text3)
+
+elif "news" in text2:
+    speak("What news would you like to know?")
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.energy_threshold=10000
+        r.adjust_for_ambient_noise(source)
+        audio=r.listen(source,10)
+        text3=r.recognize_google(audio)
+    speak("Searching for news on {}".format(text3))
+    news_articles = News(text3) 
+    for article in news_articles:
+        print(article)
+        speak(article)
+
+elif any(word in text2 for word in ["fact", "facts"]):  # ✅ Corrected condition
+    speak("Here is a random fact:")
+    x = randfacts.getFact()
+    print(x)
+    speak(x)
+
+elif any(word in text2 for word in ["joke", "jokes"]):
+    speak("Here is a joke:")
+    asyncio.run(print_joke())
+    speak(print_joke())
+    speak("I hope you enjoyed the joke.")
